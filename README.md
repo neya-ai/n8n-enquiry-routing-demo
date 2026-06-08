@@ -167,12 +167,12 @@ n8n-enquiry-routing-demo/
 
 <p align="center">
   <img src="screenshots/airtable-enquiries.png" width="700"/><br/>
-  <strong>Airtable Enquiries table storing valid routed submissions</strong>
+  <strong>Airtable Enquiries table showing selected output columns for valid routed submissions</strong>
 </p>
 
 <p align="center">
   <img src="screenshots/airtable-review-queue.png" width="700"/><br/>
-  <strong>Airtable Review Queue storing invalid or review-needed records</strong>
+  <strong>Airtable Review Queue showing selected columns for invalid or review-needed records</strong>
 </p>
 
 <p align="center">
