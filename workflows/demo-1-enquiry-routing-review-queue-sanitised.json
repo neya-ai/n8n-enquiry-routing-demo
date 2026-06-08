@@ -1,0 +1,1201 @@
+{
+  "name": "Demo 1- Enquiry Routing and Review Queue",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c339e22f-720c-4e35-8e49-65bf2aaa0026",
+              "leftValue": "={{ $json.priority.toLowerCase() }}",
+              "rightValue": "normal",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1776,
+        -96
+      ],
+      "id": "f2c054b3-1c5b-49e4-a878-0e1f1db992d3",
+      "name": "Check if priority is normal"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d3822d4e-66a7-4f69-9a9b-9f1c3418524d",
+              "name": "routing_result",
+              "value": "Standard follow-up",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2000,
+        -192
+      ],
+      "id": "a42db2f8-2913-442f-97f5-dc228191f013",
+      "name": "Mark as normal priority"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8a7f541-a7a5-4470-b2d5-2d5258050a64",
+              "name": "routing_result",
+              "value": "Needs review",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2000,
+        0
+      ],
+      "id": "adbeefb8-ff0f-4996-8fc7-e8da7ea68450",
+      "name": "Mark as non-normal priority"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60f522c3-a524-4727-aad7-7df1b1a7c3dc",
+              "name": "summary",
+              "value": "={{ $json.name }} requested {{ $json.service_requested }}. Priority: {{ $json.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "3c142ae1-9940-4b6e-8c44-ee2151ad3d69",
+              "name": "client_label",
+              "value": "={{ $json.name }} - {{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "4227330e-f8e0-4803-a4e5-de37420b2a2b",
+              "name": "follow_up_message",
+              "value": "=Hello  {{ $json.name }}, we received your request for {{ $json.service_requested }}. Your current status is {{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "b4c84cc6-8902-4342-96df-c0c8871c2c2f",
+              "name": "internal_note",
+              "value": "=Enquiry from  {{ $json.name }} should be handled as {{ $json.priority }} priority",
+              "type": "string"
+            },
+            {
+              "id": "3e2156cf-5ab6-4bc0-a980-4306680d4efa",
+              "name": "review_required",
+              "value": "={{ $json.priority === \"urgent\" ? \"Yes\" : \"No\" }}",
+              "type": "string"
+            },
+            {
+              "id": "399176c4-b0f1-4777-a344-39023b877311",
+              "name": "owner_message",
+              "value": "={{ $json.priority === \"urgent\" ? \"Please review this enquiry urgently.\" : \"This enquiry can follow the standard process.\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1552,
+        -96
+      ],
+      "id": "a3ed319e-907a-41c1-8be8-055db5e0559c",
+      "name": "Create summary fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2224,
+        -96
+      ],
+      "id": "c433c38f-961b-4d2b-ad7c-030c1406b528",
+      "name": "Merge route enquires"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appxxxxxxxx",
+          "mode": "list",
+          "cachedResultName": "n8n Test Enquiries",
+          "cachedResultUrl": "https://airtable.com/xxxxxxxxxxxxx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxxxxxxxxxxx",
+          "mode": "list",
+          "cachedResultName": "Enquiries",
+          "cachedResultUrl": "https://airtable.com/xxxxxxxxxx/xxxxxxxxx"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "service_requested": "={{ $json.service_requested }}",
+            "priority": "={{ $json.priority }}",
+            "status": "={{ $json.status }}",
+            "summary": "={{ $json.summary }}",
+            "review_required": "={{ $json.review_required }}",
+            "owner_message": "={{ $json.owner_message }}",
+            "routing_result": "={{ $json.routing_result }}",
+            "message": "={{ $json.message }}",
+            "notification_message": "={{ $json.notification_message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "service_requested",
+              "displayName": "service_requested",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "review_required",
+              "displayName": "review_required",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "owner_message",
+              "displayName": "owner_message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "routing_result",
+              "displayName": "routing_result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notification_message",
+              "displayName": "notification_message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        2672,
+        -96
+      ],
+      "id": "d2532cb2-e7b3-4899-89b2-9f9863ff39fc",
+      "name": "Save enquiry to Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Airtable_base_ID",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "70b4e0f9-a614-459f-88d1-4e2e025918e8",
+              "name": "validation_status",
+              "value": "failed",
+              "type": "string"
+            },
+            {
+              "id": "fc33fba2-519b-4fc4-8c80-7a676fb48bf6",
+              "name": "validation_issue",
+              "value": "Missing or invalid email",
+              "type": "string"
+            },
+            {
+              "id": "c4f4bf0b-7577-4c85-9316-743f55e5c084",
+              "name": "routing_result",
+              "value": "Needs Manual review- invalid email",
+              "type": "string"
+            },
+            {
+              "id": "43cedf02-5c72-4644-bd7b-c2672ad55514",
+              "name": "owner_message",
+              "value": "Please review this enquiry because the email is missing or invalid.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        384
+      ],
+      "id": "74e07fa6-e867-44de-9964-0ca22a302176",
+      "name": "Mark invalid email"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1328,
+        288
+      ],
+      "id": "a927d3bb-d79b-4eb9-b2ce-4c75ad855be9",
+      "name": "Merge review queue records"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c2ad76b-b97c-4c7d-b270-ed97f20d34f1",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        880,
+        0
+      ],
+      "id": "56541e9a-a7e7-4e89-b9f6-2136198d2906",
+      "name": "Check message is not empty"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "617e2f7c-b6cc-44b8-9287-8e3db34eca8c",
+              "name": "=validation_status",
+              "value": "failed",
+              "type": "string"
+            },
+            {
+              "id": "6fd70d1c-b700-4af1-9068-2437d462da2c",
+              "name": "validation_issue",
+              "value": "Missing message",
+              "type": "string"
+            },
+            {
+              "id": "219467ba-87b1-4f49-a58a-efa8306bb69f",
+              "name": "routing_result",
+              "value": "Needs manual review - missing message",
+              "type": "string"
+            },
+            {
+              "id": "f7fbd1c2-45dd-4a4d-803b-c494c46bf268",
+              "name": "owner_message",
+              "value": "Please review this enquiry because the message is missing.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        192
+      ],
+      "id": "f0fca86f-a378-4b38-8042-541561cc2c08",
+      "name": "Mark missing message"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a8e24571-8a16-4a1f-ae17-f06737eb6791",
+              "leftValue": "={{ $json.message.toLowerCase() }}",
+              "rightValue": "urgent",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1104,
+        -96
+      ],
+      "id": "dd1ac41b-3cb3-4494-8aa8-d8f1971be66b",
+      "name": "Check message for urgent keyword"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "546ec77d-d555-42f6-9e43-50e97566b4a6",
+              "name": "priority",
+              "value": "urgent",
+              "type": "string"
+            },
+            {
+              "id": "e0124dca-df6f-464b-b02b-ce4501ac36bd",
+              "name": "review_required",
+              "value": "Yes",
+              "type": "string"
+            },
+            {
+              "id": "0d2259ae-5219-4d0c-b991-ed37e9178dd3",
+              "name": "routing_result",
+              "value": "Needs review - urgent keyword detected",
+              "type": "string"
+            },
+            {
+              "id": "6939d4a9-a706-45ad-bc26-e819b5b2385c",
+              "name": "owner_message",
+              "value": "Please review this enquiry urgently because the message contains an urgent keyword.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        -160
+      ],
+      "id": "f789f8a2-fcb0-4dd3-9991-b3c1521da030",
+      "name": "Mark urgent keyword detected"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bba3a87f-a04d-40db-a0b6-56b4293928ac",
+              "name": "notification_message",
+              "value": "=New enquiry received:  \nName: {{ $json.name }} \nEmail: {{ $json.email }}  \nService requested: {{ $json.service_requested }}  \nPriority: {{ $json.priority }}  \nMessage: {{ $json.message }}\n\nOwner_action: {{ $json.owner_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2448,
+        -96
+      ],
+      "id": "12597eda-caa7-44cb-83d5-c007410223fa",
+      "name": "Create notification message"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c90e46d-670b-4ec0-8e69-178013cbd25f",
+              "name": "notification_message",
+              "value": "=Review queue item:\nName: {{ $json.name }}\nEmail: {{ $json.email }}\nIssue: {{ $json.validation_issue }}\nService requested: {{ $json.service_requested }}\nMessage: {{ $json.message }}\n\nOwner action:\n{{ $json.owner_message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1552,
+        288
+      ],
+      "id": "a629a033-6b6b-47dc-8cf6-c98485ae4943",
+      "name": "Create review queue notification"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4f9e0674-2c10-4708-8baa-05034119d36d",
+              "name": "name",
+              "value": "={{ $json[\"Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "964335b3-bbd6-4657-b4a6-3d34a79e2b82",
+              "name": "email",
+              "value": "={{ $json[\"E-mail\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "b3771bbe-f695-491c-a964-8e94e5654e7e",
+              "name": "service_requested",
+              "value": "={{ $json[\"Service Requested\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "8f8516e8-6483-4a6e-bc92-39734c33c8be",
+              "name": "status",
+              "value": "new",
+              "type": "string"
+            },
+            {
+              "id": "c96c4739-b75b-40a8-bff4-662c9dd4523f",
+              "name": "priority",
+              "value": "={{ $json[\"Priority\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "8ecb655d-5e2e-4c55-a2d2-71e2fd791383",
+              "name": "message",
+              "value": "={{ $json[\"Message\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        96
+      ],
+      "id": "8a5a0d9f-c61d-4c57-b6fe-60c6d77cbc64",
+      "name": "Clean form fields"
+    },
+    {
+      "parameters": {
+        "formTitle": "New Enquiry Form",
+        "formDescription": "Submit your enquiry and we will review it shortly.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "E-mail",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Service Requested",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Priority",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Normal"
+                  },
+                  {
+                    "option": "Urgent"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Message",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        208,
+        96
+      ],
+      "id": "60c37984-aef0-4033-b2b3-758ae334a96a",
+      "name": "Enquiry form submission",
+      "webhookId": "YOUR_FORM_WEBHOOK_ID"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "69ebffe9-a37a-4eee-b2ed-3993bbb846f8",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "611f11d3-d635-45c6-8d68-08660fbeb024",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "9d42a040-88f7-45be-a644-9f75342a0afc",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": ".",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        96
+      ],
+      "id": "10533233-f8ca-4f02-b7b9-f6197ec40f23",
+      "name": "Check email is valid enough"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appxxxxxxxxx",
+          "mode": "list",
+          "cachedResultName": "n8n Test Enquiries",
+          "cachedResultUrl": "https://airtable.com/appxxxxxxxxxxxx"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxxxxxxxxxxx",
+          "mode": "list",
+          "cachedResultName": "Review Queue",
+          "cachedResultUrl": "https://airtable.com/appxxxxxxxxxx/tblxxxxxxxxx"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "routing_result": "={{ $json.routing_result }}",
+            "validation_issue": "={{ $json.validation_issue }}",
+            "validation_status": "={{ $json.validation_status }}",
+            "message": "={{ $json.message }}",
+            "service_requested": "={{ $json.service_requested }}",
+            "status": "={{ $json.status }}",
+            "priority": "={{ $json.priority }}",
+            "owner_message": "={{ $json.owner_message }}",
+            "notification_message": "={{ $json.notification_message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "service_requested",
+              "displayName": "service_requested",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "validation_status",
+              "displayName": "validation_status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "validation_issue",
+              "displayName": "validation_issue",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "routing_result",
+              "displayName": "routing_result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "owner_message",
+              "displayName": "owner_message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notification_message",
+              "displayName": "notification_message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1776,
+        288
+      ],
+      "id": "ba4c6238-96d1-4122-9976-f758a38dbf13",
+      "name": "Save invalid inquiry to Review Queue",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "Airtable_base_ID",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "YOUR_DISCORD_WEBHOOK_URL",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": {{ JSON.stringify($json.fields.notification_message) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2896,
+        -96
+      ],
+      "id": "f7777ff4-b65f-46fa-bd54-2836e8c249b0",
+      "name": "Send valid enquiry notification"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "YOUR_DISCORD_WEBHOOK_URL",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"content\": {{ JSON.stringify($json.fields.notification_message) }}\n   \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2000,
+        288
+      ],
+      "id": "e5835d52-a48e-4a50-a25f-a840d0023956",
+      "name": "Send review queue notification"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Check if priority is normal": {
+      "main": [
+        [
+          {
+            "node": "Mark as normal priority",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark as non-normal priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as normal priority": {
+      "main": [
+        [
+          {
+            "node": "Merge route enquires",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create summary fields": {
+      "main": [
+        [
+          {
+            "node": "Check if priority is normal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as non-normal priority": {
+      "main": [
+        [
+          {
+            "node": "Merge route enquires",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge route enquires": {
+      "main": [
+        [
+          {
+            "node": "Create notification message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark invalid email": {
+      "main": [
+        [
+          {
+            "node": "Merge review queue records",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge review queue records": {
+      "main": [
+        [
+          {
+            "node": "Create review queue notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check message is not empty": {
+      "main": [
+        [
+          {
+            "node": "Check message for urgent keyword",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark missing message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark missing message": {
+      "main": [
+        [
+          {
+            "node": "Merge review queue records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check message for urgent keyword": {
+      "main": [
+        [
+          {
+            "node": "Mark urgent keyword detected",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create summary fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark urgent keyword detected": {
+      "main": [
+        [
+          {
+            "node": "Create summary fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create notification message": {
+      "main": [
+        [
+          {
+            "node": "Save enquiry to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create review queue notification": {
+      "main": [
+        [
+          {
+            "node": "Save invalid inquiry to Review Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean form fields": {
+      "main": [
+        [
+          {
+            "node": "Check email is valid enough",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enquiry form submission": {
+      "main": [
+        [
+          {
+            "node": "Clean form fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check email is valid enough": {
+      "main": [
+        [
+          {
+            "node": "Check message is not empty",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark invalid email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send valid enquiry notification": {
+      "main": [
+        []
+      ]
+    },
+    "Send review queue notification": {
+      "main": [
+        []
+      ]
+    },
+    "Save invalid inquiry to Review Queue": {
+      "main": [
+        [
+          {
+            "node": "Send review queue notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save enquiry to Airtable": {
+      "main": [
+        [
+          {
+            "node": "Send valid enquiry notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "YOUR_N8N_VERSION_ID",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_N8N_INSTANCE_ID"
+  },
+  "id": "Yz8XiZKJssn7mLXs",
+  "tags": []
+}
